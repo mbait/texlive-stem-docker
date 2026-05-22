@@ -6,7 +6,7 @@ RUN apk --update add msttcorefonts-installer \
 
 COPY ./fonts/*.ttf /fonts/truetype/astra/
 
-FROM debian:bookworm AS base
+FROM debian:bookworm-slim AS base
 
 COPY --from=font-builder /fonts /usr/share/fonts/truetype/astra/
 COPY --from=font-builder /usr/share/fonts/truetype/msttcorefonts /usr/share/fonts/truetype/msttcorefonts
@@ -33,7 +33,10 @@ RUN apt-get update && \
         perl \
         wget \
         xz-utils \
-        && rm -rf /var/lib/apt/lists/*
+        && rm -rf /var/lib/apt/lists/* \
+	/var/cache/apt/archives/* \
+	/usr/share/doc/* \
+	/usr/share/man/*
 
 # Russian UTF-8 locale
 RUN sed -i 's/# ru_RU.UTF-8 UTF-8/ru_RU.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
@@ -41,9 +44,6 @@ RUN sed -i 's/# ru_RU.UTF-8 UTF-8/ru_RU.UTF-8 UTF-8/' /etc/locale.gen && locale-
 ENV LANG=ru_RU.UTF-8
 ENV LC_ALL=ru_RU.UTF-8
 
-# ------------------------------------------------------------
-# Install TeX Live 2025 (locked)
-# ------------------------------------------------------------
 WORKDIR /tmp/install-tl
 
 RUN <<EOF
